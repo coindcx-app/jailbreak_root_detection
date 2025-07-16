@@ -1,0 +1,36 @@
+# Workflow to Scan & Build your code and report vulnerabilities for every Pull Request
+# Maintainer: Nishith Kulshrestha <nishith.kulshrestha@coindcx.com> , Ashutosh Purohit <ashutosh.purohit@coindcx.com>
+# Refer Snyk document: https://coindcx.atlassian.net/wiki/spaces/DevopsPlatform/pages/3012460604/SonarQube+Configuration+and+Self+Service+Document
+# Refer Sysdig document: https://coindcx.atlassian.net/wiki/spaces/DevopsPlatform/pages/3012460604/SonarQube+Configuration+and+Self+Service+Document
+# Injected during repo creation and (may have already been)/(may be) updated by developers.
+
+name: Snyk and Sysdig Vul Scanning
+on:
+  pull_request:
+    branches:
+    ## Update your branches
+      - master
+      - main
+      - preprod
+      - staging
+      - sandbox
+      - release/*
+  push:
+    branches:
+      - master
+      - main
+      - preprod
+      - staging
+      - sandbox
+      - release/*
+jobs:
+  snyk_scan:
+    uses: coindcx-devops/golden-images/.github/workflows/ci_snyk.yml@main
+    secrets: inherit
+    with:
+      DOCKERFILE_PATH: "deployment/Dockerfile"
+  sysdig_scan:
+    uses: coindcx-devops/golden-images/.github/workflows/ci_sysdig.yml@main
+    secrets: inherit
+    needs:
+      - snyk_scan
