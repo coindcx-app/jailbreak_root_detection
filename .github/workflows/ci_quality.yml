@@ -1,0 +1,40 @@
+# CI Code Quality Workflow, uses remote central workflow
+# Maintainer: Nishith Kulshrestha <nishith.kulshrestha@coindcx.com>
+# Refer SonarQube document: https://coindcx.atlassian.net/wiki/spaces/DevopsPlatform/pages/3012460604/SonarQube+Configuration+and+Self+Service+Document
+# Injected during repo creation and (may have already been)/(may be) updated by developers.
+
+name: Code Quality Check
+on:
+  pull_request:
+    ## Update branches as per doc
+    branches:
+      - master
+      - main
+      - preprod
+      - staging
+      - sandbox
+      - release/*
+  push:
+    branches:
+      - master
+      - main
+      - preprod
+      - staging
+      - sandbox
+      - release/*
+jobs:
+  checks:
+    uses: coindcx-devops/golden-images/.github/workflows/ci_nodejs_checks.yaml@main ## Update as required.
+    secrets: inherit
+  coverage:
+    uses: coindcx-devops/golden-images/.github/workflows/ci_nodejs_test.yaml@main ## Update as per doc.
+    secrets: inherit
+    with:
+      COVERAGE_REPORT: true
+      ## Add other variables as per sonar doc.
+  quality:
+    uses: coindcx-devops/golden-images/.github/workflows/ci_sonar.yml@main
+    secrets: inherit
+    needs:
+      - coverage
+    if: always()
